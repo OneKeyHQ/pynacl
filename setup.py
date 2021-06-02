@@ -173,36 +173,41 @@ class build_clib(_build_clib):
             configure_flags.append("--disable-ssp")
         if os.environ.get('SODIUM_INSTALL_MINIMAL'):
             configure_flags.append("--enable-minimal")
-        subprocess.check_call(
-            [configure] + configure_flags +
-            ["--prefix", os.path.abspath(self.build_clib)],
-            cwd=build_temp,
-        )
+        #subprocess.check_call(
+        #    [configure] + configure_flags +
+        #    ["--prefix", os.path.abspath(self.build_clib)],
+        #    cwd=build_temp,
+        #)
 
         make_args = os.environ.get('LIBSODIUM_MAKE_ARGS', '').split()
         # Build the library
-        subprocess.check_call(["make"] + make_args, cwd=build_temp)
+        #subprocess.check_call(["make"] + make_args, cwd=build_temp)
 
         # Check the build library
-        subprocess.check_call(["make", "check"] + make_args, cwd=build_temp)
+        #subprocess.check_call(["make", "check"] + make_args, cwd=build_temp)
 
         # Install the built library
-        subprocess.check_call(["make", "install"] + make_args, cwd=build_temp)
+        #subprocess.check_call(["make", "install"] + make_args, cwd=build_temp)
+
+        # Build the library
+        build_path = abshere("src/libsodium/")
+        subprocess.check_call("./dist-build/ios.sh", cwd=build_path)
 
 
 class build_ext(_build_ext):
 
     def run(self):
         if self.distribution.has_c_libraries():
-            build_clib = self.get_finalized_command("build_clib")
+            #build_clib = self.get_finalized_command("build_clib")
+            build_clib = abshere("src/libsodium/libsodium-ios")
             self.include_dirs.append(
-                os.path.join(build_clib.build_clib, "include"),
+                os.path.join(build_clib, "include"),
             )
             self.library_dirs.insert(
-                0, os.path.join(build_clib.build_clib, "lib64"),
+                0, os.path.join(build_clib, "lib64"),
             )
             self.library_dirs.insert(
-                0, os.path.join(build_clib.build_clib, "lib"),
+                0, os.path.join(build_clib, "lib"),
             )
 
         return _build_ext.run(self)
